@@ -60,8 +60,9 @@ dependencies {
 
 #### Shading
 
-Do not extract the JAR into your project if you're using maven. You have to shade the library, otherwise your plugin or other plugins will break due to version mismatch. To shade the library, add the following under your maven plugins:
+Do not extract the JAR into your project. You have to shade the library, otherwise your plugin or other plugins will break due to version mismatch. To shade the library, add the following under your maven plugins:
 
+[Apache Maven Shade Plugin](https://maven.apache.org/plugins/maven-shade-plugin/)
 ```
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
@@ -84,6 +85,19 @@ Do not extract the JAR into your project if you're using maven. You have to shad
         </execution>
     </executions>
 </plugin>
+```
+
+[Gradle Shadow plugin](https://imperceptiblethoughts.com/shadow/)
+```
+plugins {
+    id("com.github.johnrengelman.shadow") version ("8.1.1")
+}
+
+tasks {
+    shadowJar {
+        relocate("com.meteor.bookapi", "myplugin.libs.bookapi")
+    }
+}
 ```
 
 #### Example
