@@ -7,17 +7,17 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class LegacyNBTEngine implements NBTEngine {
-    private static final Constructor<?> NMS_Class_NBTTagCompound_Constructor;
-    private static final Constructor<?> NMS_Class_NBTTagList_Constructor;
-    private static final Constructor<?> NMS_Class_NBTTagString_Constructor;
-    private static final Method NMS_Class_NBTTagList_Add_Method;
-    private static final Field NMS_Class_NBTTagCompound_Map_Field;
-    private static final Field NMS_Class_ItemStack_NBTTagCompound_Field;
+    private static final Constructor<?> NMS_NBTTAGCOMPOUND_CONSTRUCTOR;
+    private static final Constructor<?> NMS_NBTTAGLIST_CONSTRUCTOR;
+    private static final Constructor<?> NMS_NBTTAGSTRING_CONSTRUCTOR;
+    private static final Method NMS_NBTTAGLIST_ADD_METHOD;
+    private static final Method NMS_NBTTAGCOMPOUND_PUT_METHOD;
+    private static final Field NMS_ITEMSTACK_NBTTAGCOMPOUND_FIELD;
 
     static {
         try {
@@ -25,39 +25,42 @@ public class LegacyNBTEngine implements NBTEngine {
             Class<?> nbClass = ReflectionUtil.getNMSClass("NBTBase", "net.minecraft.nbt");
             Class<?> ntcClass = ReflectionUtil.getNMSClass("NBTTagCompound", "net.minecraft.nbt");
             Class<?> ntlClass = ReflectionUtil.getNMSClass("NBTTagList", "net.minecraft.nbt");
-            NMS_Class_NBTTagCompound_Constructor = ntcClass.getDeclaredConstructor();
-            NMS_Class_NBTTagList_Constructor = ntlClass.getDeclaredConstructor();
-            NMS_Class_NBTTagString_Constructor = ReflectionUtil.getNMSClass("NBTTagString", "net.minecraft.nbt").getDeclaredConstructor(String.class);
+            NMS_NBTTAGCOMPOUND_CONSTRUCTOR = ntcClass.getDeclaredConstructor();
+            NMS_NBTTAGLIST_CONSTRUCTOR = ntlClass.getDeclaredConstructor();
+            NMS_NBTTAGSTRING_CONSTRUCTOR = ReflectionUtil.getNMSClass("NBTTagString", "net.minecraft.nbt").getDeclaredConstructor(String.class);
 
             Method method;
             try {
                 method = ntlClass.getDeclaredMethod("add", nbClass);
             } catch (NoSuchMethodException e) {
                 method = ntlClass.getMethod("add", Object.class);
-            } NMS_Class_NBTTagList_Add_Method = method;
+            } NMS_NBTTAGLIST_ADD_METHOD = Objects.requireNonNull(method);
+
+            method = null;
+            for (Method pMethod : ntcClass.getDeclaredMethods()) {
+                if (Modifier.isStatic(pMethod.getModifiers())) continue;
+                Class<?>[] params = pMethod.getParameterTypes();
+                if (params.length == 2 && params[0] == String.class && params[1] == nbClass) {
+                    method = pMethod;
+                    break;
+                }
+            } NMS_NBTTAGCOMPOUND_PUT_METHOD = Objects.requireNonNull(method);
 
             Field field = null;
-            for (Field mapField : ntcClass.getDeclaredFields()) {
-                if (mapField.getType() == Map.class) {
-                    field = mapField;
+            for (Field tField : isClass.getDeclaredFields()) {
+                if (Modifier.isStatic(tField.getModifiers())) continue;
+                if (tField.getType() == ntcClass) {
+                    field = tField;
                     break;
                 }
-            } NMS_Class_NBTTagCompound_Map_Field = Objects.requireNonNull(field);
+            } NMS_ITEMSTACK_NBTTAGCOMPOUND_FIELD = Objects.requireNonNull(field);
 
-            field = null;
-            for (Field tagField : isClass.getDeclaredFields()) {
-                if (tagField.getType() == ntcClass) {
-                    field = tagField;
-                    break;
-                }
-            } NMS_Class_ItemStack_NBTTagCompound_Field = Objects.requireNonNull(field);
-
-            LegacyNBTEngine.NMS_Class_NBTTagCompound_Constructor.setAccessible(true);
-            LegacyNBTEngine.NMS_Class_NBTTagList_Constructor.setAccessible(true);
-            LegacyNBTEngine.NMS_Class_NBTTagString_Constructor.setAccessible(true);
-            LegacyNBTEngine.NMS_Class_NBTTagList_Add_Method.setAccessible(true);
-            LegacyNBTEngine.NMS_Class_NBTTagCompound_Map_Field.setAccessible(true);
-            LegacyNBTEngine.NMS_Class_ItemStack_NBTTagCompound_Field.setAccessible(true);
+            NMS_NBTTAGCOMPOUND_CONSTRUCTOR.setAccessible(true);
+            NMS_NBTTAGLIST_CONSTRUCTOR.setAccessible(true);
+            NMS_NBTTAGSTRING_CONSTRUCTOR.setAccessible(true);
+            NMS_NBTTAGLIST_ADD_METHOD.setAccessible(true);
+            NMS_NBTTAGCOMPOUND_PUT_METHOD.setAccessible(true);
+            NMS_ITEMSTACK_NBTTAGCOMPOUND_FIELD.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -65,19 +68,17 @@ public class LegacyNBTEngine implements NBTEngine {
 
     @Override
     public void setBookNBT(Object nmsItem, String author, String title, List<BaseComponent[]> pages) throws Exception {
-        Object nbtAuthor = LegacyNBTEngine.NMS_Class_NBTTagString_Constructor.newInstance(author);
-        Object nbtTitle = LegacyNBTEngine.NMS_Class_NBTTagString_Constructor.newInstance(title);
-        Object nbtPages = LegacyNBTEngine.NMS_Class_NBTTagList_Constructor.newInstance();
-        Object nbtCompound = LegacyNBTEngine.NMS_Class_NBTTagCompound_Constructor.newInstance();
+        Object nbtAuthor = NMS_NBTTAGSTRING_CONSTRUCTOR.newInstance(author);
+        Object nbtTitle = NMS_NBTTAGSTRING_CONSTRUCTOR.newInstance(title);
+        Object nbtPages = NMS_NBTTAGLIST_CONSTRUCTOR.newInstance();
+        Object nbtCompound = NMS_NBTTAGCOMPOUND_CONSTRUCTOR.newInstance();
         for (BaseComponent[] page : pages) {
-            LegacyNBTEngine.NMS_Class_NBTTagList_Add_Method.invoke(nbtPages, LegacyNBTEngine.NMS_Class_NBTTagString_Constructor.newInstance(ComponentSerializer.toString(page)));
+            NMS_NBTTAGLIST_ADD_METHOD.invoke(nbtPages, NMS_NBTTAGSTRING_CONSTRUCTOR.newInstance(ComponentSerializer.toString(page)));
         }
 
-        //noinspection unchecked
-        Map<String, Object> map = (Map<String, Object>) LegacyNBTEngine.NMS_Class_NBTTagCompound_Map_Field.get(nbtCompound);
-        map.put("author", nbtAuthor);
-        map.put("title", nbtTitle);
-        map.put("pages", nbtPages);
-        LegacyNBTEngine.NMS_Class_ItemStack_NBTTagCompound_Field.set(nmsItem, nbtCompound);
+        NMS_NBTTAGCOMPOUND_PUT_METHOD.invoke(nbtCompound, "author", nbtAuthor);
+        NMS_NBTTAGCOMPOUND_PUT_METHOD.invoke(nbtCompound, "title", nbtTitle);
+        NMS_NBTTAGCOMPOUND_PUT_METHOD.invoke(nbtCompound, "pages", nbtPages);
+        NMS_ITEMSTACK_NBTTAGCOMPOUND_FIELD.set(nmsItem, nbtCompound);
     }
 }

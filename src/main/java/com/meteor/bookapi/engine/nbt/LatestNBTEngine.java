@@ -13,12 +13,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class LatestNBTEngine implements NBTEngine {
-    private static final Constructor<?> NMS_Class_WrittenBookContent_Constructor;
-    private static final Method CraftBukkit_Class_CraftChatMessage_FromJSON_Method;
-    private static final Method NMS_Class_Filterable_PassThrough_Method;
-    private static final Field NMS_Class_ItemStack_PatchedDataComponentMap_Field;
-    private static final Field NMS_Class_PatchedDataComponentMap_Reference2ObjectMap_Field;
-    private static final Object NMS_Class_DataComponentType_WrittenBookContent_Object;
+    private static final Constructor<?> NMS_WRITTENBOOKCONTENT_CONSTRUCTOR;
+    private static final Method CRAFTBUKKIT_CRAFTCHATMESSAGE_FROMJSON_METHOD;
+    private static final Method NMS_FILTERABLE_PASSTHROUGH_METHOD;
+    private static final Field NMS_ITEMSTACK_PATCHEDDATACOMPONENTMAP_FIELD;
+    private static final Field NMS_PATCHEDDATACOMPONENTMAP_REFERENCE2OBJECTMAP_FIELD;
+    private static final Object NMS_DATACOMPONENTTYPE_WRITTENBOOKCONTENT_OBJECT;
 
     static {
         try {
@@ -26,46 +26,50 @@ public class LatestNBTEngine implements NBTEngine {
             Class<?> pdcmClass = ReflectionUtil.getNMSClass("PatchedDataComponentMap", "net.minecraft.core.component");
             Class<?> isClass = ReflectionUtil.getNMSClass("ItemStack", "net.minecraft.world.item");
             Class<?> dcClass = ReflectionUtil.getNMSClass("DataComponents", "net.minecraft.core.component");
+            Class<?> dctClass = ReflectionUtil.getNMSClass("DataComponentType", "net.minecraft.core.component");
             Class<?> wbcClass = ReflectionUtil.getNMSClass("WrittenBookContent", "net.minecraft.world.item.component");
-            NMS_Class_WrittenBookContent_Constructor = ReflectionUtil.getNMSClass("WrittenBookContent", "net.minecraft.world.item.component").getConstructor(fClass, String.class, int.class, List.class, boolean.class);
-            CraftBukkit_Class_CraftChatMessage_FromJSON_Method = ReflectionUtil.getOBCClass("util.CraftChatMessage").getDeclaredMethod("fromJSON", String.class);
-            NMS_Class_Filterable_PassThrough_Method = fClass.getDeclaredMethod("a", Object.class);
+            NMS_WRITTENBOOKCONTENT_CONSTRUCTOR = ReflectionUtil.getNMSClass("WrittenBookContent", "net.minecraft.world.item.component").getDeclaredConstructor(fClass, String.class, int.class, List.class, boolean.class);
+            CRAFTBUKKIT_CRAFTCHATMESSAGE_FROMJSON_METHOD = ReflectionUtil.getOBCClass("util.CraftChatMessage").getDeclaredMethod("fromJSON", String.class);
+            NMS_FILTERABLE_PASSTHROUGH_METHOD = fClass.getDeclaredMethod("a", Object.class);
 
             Field field = null;
             for (Field pdcmField : isClass.getDeclaredFields()) {
+                if (Modifier.isStatic(pdcmField.getModifiers())) continue;
                 if (pdcmField.getType() == pdcmClass) {
                     field = pdcmField;
                     break;
                 }
-            } NMS_Class_ItemStack_PatchedDataComponentMap_Field = Objects.requireNonNull(field);
+            } NMS_ITEMSTACK_PATCHEDDATACOMPONENTMAP_FIELD = Objects.requireNonNull(field);
 
             field = null;
-            for (Field mapField : pdcmClass.getDeclaredFields()) {
-                if (mapField.getType() == Reference2ObjectMap.class) {
-                    field = mapField;
+            for (Field mField : pdcmClass.getDeclaredFields()) {
+                if (Modifier.isStatic(mField.getModifiers())) continue;
+                if (mField.getType() == Reference2ObjectMap.class) {
+                    field = mField;
                     break;
                 }
-            } NMS_Class_PatchedDataComponentMap_Reference2ObjectMap_Field = Objects.requireNonNull(field);
+            } NMS_PATCHEDDATACOMPONENTMAP_REFERENCE2OBJECTMAP_FIELD = Objects.requireNonNull(field);
 
             field = null;
             for (Field wbcField : dcClass.getDeclaredFields()) {
                 if (!Modifier.isStatic(wbcField.getModifiers())) continue;
+                if (wbcField.getType() != dctClass) continue;
                 Type generic = wbcField.getGenericType();
                 if (generic instanceof ParameterizedType) {
                     Type[] actual = ((ParameterizedType) generic).getActualTypeArguments();
-                    if (actual.length >= 1 && actual[0].equals(wbcClass)) {
+                    if (actual.length == 1 && actual[0] == wbcClass) {
                         wbcField.setAccessible(true);
                         field = wbcField;
                         break;
                     }
                 }
-            } NMS_Class_DataComponentType_WrittenBookContent_Object = Objects.requireNonNull(field).get(null);
+            } NMS_DATACOMPONENTTYPE_WRITTENBOOKCONTENT_OBJECT = Objects.requireNonNull(field).get(null);
 
-            LatestNBTEngine.NMS_Class_WrittenBookContent_Constructor.setAccessible(true);
-            LatestNBTEngine.CraftBukkit_Class_CraftChatMessage_FromJSON_Method.setAccessible(true);
-            LatestNBTEngine.NMS_Class_Filterable_PassThrough_Method.setAccessible(true);
-            LatestNBTEngine.NMS_Class_ItemStack_PatchedDataComponentMap_Field.setAccessible(true);
-            LatestNBTEngine.NMS_Class_PatchedDataComponentMap_Reference2ObjectMap_Field.setAccessible(true);
+            NMS_WRITTENBOOKCONTENT_CONSTRUCTOR.setAccessible(true);
+            CRAFTBUKKIT_CRAFTCHATMESSAGE_FROMJSON_METHOD.setAccessible(true);
+            NMS_FILTERABLE_PASSTHROUGH_METHOD.setAccessible(true);
+            NMS_ITEMSTACK_PATCHEDDATACOMPONENTMAP_FIELD.setAccessible(true);
+            NMS_PATCHEDDATACOMPONENTMAP_REFERENCE2OBJECTMAP_FIELD.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -75,11 +79,11 @@ public class LatestNBTEngine implements NBTEngine {
     public void setBookNBT(Object nmsItem, String author, String title, List<BaseComponent[]> pages) throws Exception {
         List<Object> list = Lists.newArrayList();
         for (BaseComponent[] page : pages) {
-            list.add(LatestNBTEngine.NMS_Class_Filterable_PassThrough_Method.invoke(null, LatestNBTEngine.CraftBukkit_Class_CraftChatMessage_FromJSON_Method.invoke(null, ComponentSerializer.toString(page))));
+            list.add(NMS_FILTERABLE_PASSTHROUGH_METHOD.invoke(null, CRAFTBUKKIT_CRAFTCHATMESSAGE_FROMJSON_METHOD.invoke(null, ComponentSerializer.toString(page))));
         }
 
         Reference2ObjectMap<Object, Optional<?>> map = new Reference2ObjectArrayMap<>();
-        map.put(LatestNBTEngine.NMS_Class_DataComponentType_WrittenBookContent_Object, Optional.of(LatestNBTEngine.NMS_Class_WrittenBookContent_Constructor.newInstance(LatestNBTEngine.NMS_Class_Filterable_PassThrough_Method.invoke(null, title), author, 0, list, true)));
-        LatestNBTEngine.NMS_Class_PatchedDataComponentMap_Reference2ObjectMap_Field.set(LatestNBTEngine.NMS_Class_ItemStack_PatchedDataComponentMap_Field.get(nmsItem), map);
+        map.put(NMS_DATACOMPONENTTYPE_WRITTENBOOKCONTENT_OBJECT, Optional.of(NMS_WRITTENBOOKCONTENT_CONSTRUCTOR.newInstance(NMS_FILTERABLE_PASSTHROUGH_METHOD.invoke(null, title), author, 0, list, true)));
+        NMS_PATCHEDDATACOMPONENTMAP_REFERENCE2OBJECTMAP_FIELD.set(NMS_ITEMSTACK_PATCHEDDATACOMPONENTMAP_FIELD.get(nmsItem), map);
     }
 }

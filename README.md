@@ -1,8 +1,7 @@
 # BookAPI
 
-[![Minecraft](https://img.shields.io/badge/Minecraft-gray)](https://shields.io/)
-[![Java](https://img.shields.io/badge/Java-8-blue)](https://shields.io/)
-[![JitPack](https://img.shields.io/badge/JitPack-v1.0.0-brightgreen?logo=jitpack)](https://jitpack.io/#Meteor2333/BookApi)
+[![Java](https://img.shields.io/badge/Java-8-blue)](https://shields.io)
+[![JitPack](https://img.shields.io/badge/JitPack-v1.0.1-brightgreen?logo=jitpack)](https://jitpack.io/#Meteor2333/BookApi)
 
 ### Introduction
 
@@ -10,14 +9,15 @@ The BookAPI is a lightweight and easy-to-use library designed for Spigot plugins
 
 This BookAPI is particularly useful for plugins that need to present information in a book format, such as tutorials, guides, or interactive menus.
 
+Release announcements for new versions will be posted on [SpigotMC](https://www.spigotmc.org).
+
 ### How It Works
 
 In Minecraft, the logic for opening a book is primarily handled on the client side. The server can only send a packet to open the book in the player's main hand, but this packet cannot contain the book's data. To work around this limitation, the BookAPI follows these steps:
 
-1. **Save the player's main hand item** to a temporary storage.
-2. **Set the player's main hand item** to a custom book with the desired data.
-3. **Send a packet** to the client to open the book.
-4. **Restore the player's main hand item** to the original item.
+1. **Set a custom book with the required data** to the player's main hand in the form of a fake item.
+2. **Send a packet** to the client to open the book.
+3. **Update the player's inventory** to restore the main hand to the original item.
 
 This approach ensures that the player's inventory remains unchanged while still allowing them to interact with the custom book.
 
@@ -32,16 +32,18 @@ Add the following repository and dependency to your `pom.xml`:
 ```
 <repositories>
     <repository>
-	    <id>jitpack.io</id>
+        <id>jitpack.io</id>
 	    <url>https://jitpack.io</url>
-	</repository>
+    </repository>
 </repositories>
 
-<dependency>
-    <groupId>com.github.Meteor2333</groupId>
-    <artifactId>BookApi</artifactId>
-    <version>1.0.0</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>com.github.Meteor2333</groupId>
+        <artifactId>BookApi</artifactId>
+        <version>1.0.1</version>
+    </dependency>
+</dependencies>
 ```
 
 #### Gradle
@@ -50,11 +52,11 @@ Add the following repository and dependency to your `build.gradle`:
 
 ```
 repositories {
-	maven { url 'https://jitpack.io/' }
+    maven { url 'https://jitpack.io/' }
 }
 
 dependencies {
-	implementation 'com.github.Meteor2333:BookApi:1.0.0'
+    implementation 'com.github.Meteor2333:BookApi:1.0.1'
 }
 ```
 
@@ -102,29 +104,34 @@ tasks {
 
 #### Example
 
-Here's a simple example of how to use the BookAPI in your plugin:
+Using BookAPI is very simple. Here are some examples:
 
 ```
-import example.bookapi.Book;
-import example.bookapi.BookApi;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+// Create a new Book instance
+Book book = new Book();
 
-public class MyPlugin extends JavaPlugin {
-    @Override
-    public void onEnable() {
-        // Create a new Book instance
-        Book book = new Book();
-        book.addPage("This is the first page of the book.");
-        book.addPage("This is the second page of the book.");
+// Set the content of the first page using String.
+book.addPage("This is the first page of the book.");
+// Or...
+book.setPage(1, "This is the first page of the book.");
 
-        // Open the book for a player
-        Player player = getServer().getPlayer("PlayerName");
-        if (player != null) {
-            BookApi.openBook(player, book);
-        }
-    }
-}
+TextComponent text = new TextComponent("This is the second page of the book.");
+text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/threads/bookapi.683632/"));
+text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Cilck to open URL").create()));
+// Set the content of the first page using BaseComponent, and this method supports multiple components.
+book.addPage(text, text);
+// Or...
+book.setPage(2, text, text);
+
+// If you want to get the content of the book, you can use
+BaseComponent[] page = book.getPage(index);
+// Or...
+List<BaseComponent[]> pages = book.getPages();
+
+// Open the book for a Player
+BookApi.openBook(player, book);
+// Or for Players...
+BookApi.openBook(players, book);
 ```
 
 ### Conclusion
