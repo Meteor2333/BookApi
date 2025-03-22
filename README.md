@@ -33,7 +33,7 @@ Add the following repository and dependency to your `pom.xml`:
 <repositories>
     <repository>
         <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
+	<url>https://jitpack.io</url>
     </repository>
 </repositories>
 
@@ -118,7 +118,7 @@ book.setPage(1, "This is the first page of the book.");
 TextComponent text = new TextComponent("This is the second page of the book.");
 text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/threads/bookapi.683632/"));
 text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Cilck to open URL").create()));
-// Set the content of the first page using BaseComponent, and this method supports multiple components.
+// Set the content of the second page using BaseComponent, and this method supports multiple components.
 book.addPage(text, text);
 // Or...
 book.setPage(2, text, text);
