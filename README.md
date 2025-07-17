@@ -39,7 +39,7 @@ Add the following repository and dependency to your `pom.xml`:
 
 <dependencies>
     <dependency>
-        <groupId>com.github.Meteor2333</groupId>
+        <groupId>cc.meteormc</groupId>
         <artifactId>BookApi</artifactId>
         <version>1.0.1</version>
     </dependency>
@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Meteor2333:BookApi:1.0.1'
+    implementation 'cc.meteormc:BookApi:1.0.1'
 }
 ```
 
