@@ -24,6 +24,8 @@ This approach ensures that the player's inventory remains unchanged while still 
 
 ### Usage
 
+This project is published on [Maven Central](https://central.sonatype.com/artifact/cc.meteormc/bookapi).
+
 To use the BookAPI in your Spigot plugin, you need to add it as a dependency in your project. Below are the instructions for both Maven and Gradle.
 
 #### Maven
@@ -34,7 +36,7 @@ Add the following repository and dependency to your `pom.xml`:
 <dependencies>
     <dependency>
         <groupId>cc.meteormc</groupId>
-        <artifactId>BookApi</artifactId>
+        <artifactId>bookapi</artifactId>
         <version>1.0.2</version>
     </dependency>
 </dependencies>
@@ -45,8 +47,12 @@ Add the following repository and dependency to your `pom.xml`:
 Add the following repository and dependency to your `build.gradle`:
 
 ```
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    implementation 'cc.meteormc:BookApi:1.0.2'
+    implementation 'cc.meteormc:bookapi:1.0.2'
 }
 ```
 
