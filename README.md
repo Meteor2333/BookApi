@@ -1,7 +1,8 @@
 # BookAPI
 
 [![Java](https://img.shields.io/badge/Java-8-blue)](https://shields.io)
-[![JitPack](https://img.shields.io/badge/JitPack-v1.0.1-brightgreen?logo=jitpack)](https://jitpack.io/#Meteor2333/BookApi)
+[![JitPack](https://img.shields.io/badge/JitPack-v1.0.2-brightgreen?logo=jitpack)](https://jitpack.io/#Meteor2333/BookApi)
+[![Maven Central](https://img.shields.io/maven-central/v/cc.meteormc/bookapi.svg)](https://central.sonatype.com/artifact/cc.meteormc/bookapi)
 
 ### Introduction
 
@@ -30,18 +31,11 @@ To use the BookAPI in your Spigot plugin, you need to add it as a dependency in 
 Add the following repository and dependency to your `pom.xml`:
 
 ```
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-
 <dependencies>
     <dependency>
-        <groupId>com.github.Meteor2333</groupId>
+        <groupId>cc.meteormc</groupId>
         <artifactId>BookApi</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </dependency>
 </dependencies>
 ```
@@ -51,12 +45,8 @@ Add the following repository and dependency to your `pom.xml`:
 Add the following repository and dependency to your `build.gradle`:
 
 ```
-repositories {
-    maven { url 'https://jitpack.io/' }
-}
-
 dependencies {
-    implementation 'com.github.Meteor2333:BookApi:1.0.1'
+    implementation 'cc.meteormc:BookApi:1.0.2'
 }
 ```
 
@@ -73,7 +63,7 @@ Do not extract the JAR into your project. You have to shade the library, otherwi
     <configuration>
         <relocations>
             <relocation>
-                <pattern>com.meteor.bookapi</pattern>
+                <pattern>cc.meteormc.bookapi</pattern>
                 <shadedPattern>myplugin.libs.bookapi</shadedPattern>
             </relocation>
         </relocations>
@@ -97,7 +87,7 @@ plugins {
 
 tasks {
     shadowJar {
-        relocate("com.meteor.bookapi", "myplugin.libs.bookapi")
+        relocate("cc.meteormc.bookapi", "myplugin.libs.bookapi")
     }
 }
 ```
@@ -118,7 +108,7 @@ book.setPage(1, "This is the first page of the book.");
 TextComponent text = new TextComponent("This is the second page of the book.");
 text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/threads/bookapi.683632/"));
 text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Cilck to open URL").create()));
-// Set the content of the first page using BaseComponent, and this method supports multiple components.
+// Set the content of the second page using BaseComponent, and this method supports multiple components.
 book.addPage(text, text);
 // Or...
 book.setPage(2, text, text);

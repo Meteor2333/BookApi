@@ -1,4 +1,4 @@
-package com.meteor.bookapi;
+package cc.meteormc.bookapi;
 
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.chat.BaseComponent;

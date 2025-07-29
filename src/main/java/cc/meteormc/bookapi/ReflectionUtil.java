@@ -1,9 +1,7 @@
-package com.meteor.bookapi;
+package cc.meteormc.bookapi;
 
-import com.google.common.annotations.Beta;
 import org.bukkit.Bukkit;
 
-@Beta
 public class ReflectionUtil {
     private static final String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 

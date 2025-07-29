@@ -1,7 +1,7 @@
-package com.meteor.bookapi.engine.nbt;
+package cc.meteormc.bookapi.engine.nbt;
 
+import cc.meteormc.bookapi.ReflectionUtil;
 import com.google.common.collect.Lists;
-import com.meteor.bookapi.ReflectionUtil;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import net.md_5.bungee.api.chat.BaseComponent;

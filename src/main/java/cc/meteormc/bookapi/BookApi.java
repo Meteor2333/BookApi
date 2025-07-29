@@ -1,11 +1,11 @@
-package com.meteor.bookapi;
+package cc.meteormc.bookapi;
 
-import com.meteor.bookapi.engine.nbt.LegacyNBTEngine;
-import com.meteor.bookapi.engine.nbt.LatestNBTEngine;
-import com.meteor.bookapi.engine.nbt.NBTEngine;
-import com.meteor.bookapi.engine.packet.BukkitAPIPacketEngine;
-import com.meteor.bookapi.engine.packet.PacketEngine;
-import com.meteor.bookapi.engine.packet.ReflectionPacketEngine;
+import cc.meteormc.bookapi.engine.nbt.LatestNBTEngine;
+import cc.meteormc.bookapi.engine.nbt.LegacyNBTEngine;
+import cc.meteormc.bookapi.engine.nbt.NBTEngine;
+import cc.meteormc.bookapi.engine.packet.BukkitAPIPacketEngine;
+import cc.meteormc.bookapi.engine.packet.PacketEngine;
+import cc.meteormc.bookapi.engine.packet.ReflectionPacketEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;

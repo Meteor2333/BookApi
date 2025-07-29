@@ -1,6 +1,6 @@
-package com.meteor.bookapi.engine.nbt;
+package cc.meteormc.bookapi.engine.nbt;
 
-import com.meteor.bookapi.ReflectionUtil;
+import cc.meteormc.bookapi.ReflectionUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 

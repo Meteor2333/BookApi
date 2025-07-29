@@ -1,4 +1,4 @@
-package com.meteor.bookapi.engine.nbt;
+package cc.meteormc.bookapi.engine.nbt;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 

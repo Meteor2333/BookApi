@@ -1,6 +1,6 @@
-package com.meteor.bookapi.engine.packet;
+package cc.meteormc.bookapi.engine.packet;
 
-import com.meteor.bookapi.ReflectionUtil;
+import cc.meteormc.bookapi.ReflectionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
